@@ -11,17 +11,23 @@ indexesToFinalRest=0; %current group of remaining indexes that will be again spl
 indexesFinal=0; %final array where grouped indexes of images should be placed
 percentsOfSize = 20; % at least THAT MANY percents of remaining (not grouped) images qty size of the new candidate group should take   
 zzz=0;%variable that prevents from recountig of average relative errors...
+
+%lets count matrix of all average relative errors and put them into matrix
+len = length(indexesRest);
+for i=1:len
+    e=viborka(:,indexesRest(i));%current image 'e' that will be compared with other remaining images
+    %current=indexesRest(i);%index of current image, turns out no neede
+    for j=1:len
+        q=viborka(:,indexesRest(j));%next image 'q' to be compared with current 'e'
+        pogr(indexesRest(i),indexesRest(j))=sum(abs((e-q)./e))./length(e); %average relative error for 'e' compared to each image 'q'     
+    end
+end
+
+%now loop and group indexes
 while indexesRest;
-    zzz=zzz+1;
     len = length(indexesRest);
     for i=1:len
-        e=viborka(:,indexesRest(i));%current image 'e' that will be compared with other remaining images
-        %current=indexesRest(i);%index of current image, turns out no neede
         for j=1:len
-            q=viborka(:,indexesRest(j));%next image 'q' to be compared with current 'e'
-            if zzz<2 % this counts all deviations (average relative errors) comparing to each other image and we have to do it once for each 'e' compared to each 'q' so it is coutned just once.
-                pogr(indexesRest(i),indexesRest(j))=abs(sum((e-q)./e))./length(e); %average relative error for 'e' compared to each image 'q'     
-            end
             if pogr(indexesRest(i),indexesRest(j))<=pogrMax %if fits to current max possible error - then index of 'q' goes to group
                 if indexesMatch
                     massLen=length(indexesMatch)+1;
